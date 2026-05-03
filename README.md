@@ -4,7 +4,7 @@ This project uses court judgment documents as the data source. Through Few-Shot 
 
 ### Method Workflow
 
-![Method Workflow](./assets/method_flowchart.png)
+![Method Workflow](./figure/method_flowchart.png)
 
 ### 1. Data Source and Preprocessing
 
