@@ -60,3 +60,65 @@ The final extraction results are saved as a **CSV file**. Each record correspond
 | `true_award` | Human-annotated true amount, Statutory Damages Award |
 | `predicted_award_single` | Normalized predicted amount used for comparison |
 | `award_match` | Whether the prediction exactly matches the label, `True` / `False` |
+
+---
+
+## Few-Shot Clustering
+
+This section describes the clustering process used to select representative samples for constructing the few-shot prompt.
+
+### 1. Data Source and Preprocessing
+
+The data is stored in MongoDB.
+
+- Database: `copyright`
+- Collection: `RST_Preprocessed_SBS`
+
+Each document contains a paragraph-level annotation field named `LLMOUT_SectionLab`, where each paragraph is assigned a label such as *Facts*, *Analysis*, *Order/Summary*, and others.
+
+This program automatically extracts paragraphs labeled as **"Order/Summary"** and removes blank or missing values to form the text corpus for analysis.
+
+### 2. Sentence Embedding
+
+To preserve the semantic characteristics of legal text, the **Legal-BERT** model, `nlpaueb/legal-bert-base-uncased`, is used to convert each text segment into a vector representation.
+
+Because the model is pretrained on legal corpora, it can capture domain-specific features such as statutory language, judicial wording, and decision-related expressions.
+
+After encoding with Legal-BERT, each text segment is represented as a 768-dimensional sentence vector, which is used for subsequent clustering analysis.
+
+### 3. Clustering
+
+The **K-Means algorithm** is applied to all Order/Summary vectors to identify semantically similar types of judicial outcomes.
+
+To determine the optimal number of clusters, *k*, the **Elbow Method** is first used to observe changes in inertia, also known as SSE, under different k values. **KneeLocator** is then used to automatically identify the optimal turning point.
+
+If the automatic detection fails, the default value is set to *k = 6*.
+
+The cosine similarity between each sample and its cluster centroid is also calculated. This allows the program to select the sample that best represents the semantic center of each cluster as the **representative sample**.
+
+### 4. Dimensionality Reduction and UMAP Visualization
+
+To support manual inspection of the clustering results, **UMAP**, or Uniform Manifold Approximation and Projection, is used to reduce the high-dimensional sentence vectors into two dimensions and generate a scatter plot.
+
+Different clusters are distinguished by color, while representative samples within each cluster are marked with a black cross, `×`.
+
+This visualization helps reveal the distribution of different judicial language patterns.
+
+### 5. Cluster Keyword Extraction
+
+To analyze the textual characteristics of each cluster, **spaCy** is used for lemmatization, and a **TF-IDF** vectorization model is used to calculate term weights.
+
+For each cluster, the top 30 keywords with the highest average TF-IDF scores are selected to represent the main semantic themes of that cluster.
+
+### 6. Outputs
+
+After execution, the program automatically generates the following output files. By default, they are saved in the `./outputs` folder.
+
+| File Name | Description |
+|---|---|
+| `elbow_plot.png` | Inertia curve under different numbers of clusters, used to inspect the optimal k value |
+| `umap_clusters.png` | Two-dimensional UMAP visualization of clustering results |
+| `representatives.csv` | Most representative samples from each cluster |
+| `cluster_summary.csv` | Cluster size, average similarity, and representative sample summary for each cluster |
+| `cluster_keywords.csv` | Top 30 TF-IDF keywords for each cluster |
+| `manifest.json` | Output record and analysis configuration, including the selected k value |
