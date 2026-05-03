@@ -2,6 +2,10 @@
 
 This project uses court judgment documents as the data source. Through Few-Shot Prompting and a large language model, it automatically extracts statutory damages amounts related to copyright issues and compares the results with human annotations for performance evaluation.
 
+### Method Workflow
+
+![Method Workflow](./assets/method_flowchart.png)
+
 ### 1. Data Source and Preprocessing
 
 - The research data consists of court judgment documents stored in a MongoDB database.
