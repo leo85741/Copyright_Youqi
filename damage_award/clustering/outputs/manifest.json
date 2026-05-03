@@ -1,0 +1,9 @@
+{
+  "picked_k": 6,
+  "elbow_plot": "./outputs/elbow_plot.png",
+  "umap_plot": "./outputs/umap_clusters.png",
+  "representatives_csv": "./outputs/representatives.csv",
+  "cluster_summary_csv": "./outputs/cluster_summary.csv",
+  "cluster_keywords_csv": "./outputs/cluster_keywords.csv",
+  "records_used": 213
+}
